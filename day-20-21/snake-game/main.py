@@ -1,21 +1,26 @@
 import time
 from turtle import Screen
 from snake import Snake
+from food import Food
+from scoreboard import Scoreboard
 
-SCREEN_WIDTH = 600
-SCREEN_HEIGHT = 600
-SCREEN_TITLE = "Snake Game"
-SCREEN_COLOR = 'black'
-SCREEN_UPDATE = 0.2
-
+WIDTH = 600
+HEIGHT = 600
+WALL = 281
+TITLE = "Snake Game"
+COLOR = 'black'
+UPDATE = 0.1
+COLLISION = 19
 
 screen = Screen()
-screen.setup(SCREEN_WIDTH, SCREEN_HEIGHT)
-screen.bgcolor(SCREEN_COLOR)
-screen.title(SCREEN_TITLE)
+screen.setup(WIDTH, HEIGHT)
+screen.bgcolor(COLOR)
+screen.title(TITLE)
 screen.tracer(0)
 
 snake = Snake()
+food = Food()
+scoreboard = Scoreboard()
 
 screen.update()
 screen.listen()
@@ -24,11 +29,34 @@ screen.onkey(snake.down, "Down")
 screen.onkey(snake.left, "Left")
 screen.onkey(snake.right, "Right")
 
-game_is_on = True
-while game_is_on:
+screen.onkey(snake.up, "W")
+screen.onkey(snake.down, "S")
+screen.onkey(snake.left, "A")
+screen.onkey(snake.right, "D")
+
+screen.onkey(snake.up, "w")
+screen.onkey(snake.down, "s")
+screen.onkey(snake.left, "a")
+screen.onkey(snake.right, "d")
+
+is_game_on = True
+while is_game_on:
     screen.update()
-    time.sleep(SCREEN_UPDATE)
+    time.sleep(UPDATE)
     snake.move()
 
+    if snake.head.distance(food) < COLLISION:
+        food.refresh()
+        scoreboard.increment()
+        snake.grow()
+
+    if abs(snake.head.xcor()) > WALL or abs(snake.head.ycor()) > WALL:
+        scoreboard.game_over()
+        is_game_on = False
+
+    for segment in snake.segments[1:]:
+        if snake.head.distance(segment) < COLLISION:
+            scoreboard.game_over()
+            is_game_on = False
 
 screen.exitonclick()
