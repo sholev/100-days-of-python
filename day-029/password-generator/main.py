@@ -80,6 +80,7 @@ def on_press_generate():
 window = Tk()
 window.title("Password Generator")
 window.config(padx=50, pady=50, bg=BLACK)
+window.resizable(False, False)
 
 canvas = Canvas(width=200, height=200, bg=BLACK, highlightthickness=0)
 logo_img = PhotoImage(file="logo.png")
