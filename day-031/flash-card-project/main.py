@@ -27,19 +27,23 @@ class Application:
         self.img_x = tk.PhotoImage(file="./images/wrong.png")
 
         canvas_width = 800
-        self.canvas = tk.Canvas(width=canvas_width, height=526, bg=BG_COLOR, highlightthickness=0)
-        self.card_img = self.canvas.create_image(400, 263, image=self.img_card_front)
+        self.canvas = tk.Canvas(width=canvas_width, height=526, bg=BG_COLOR)
+        self.canvas.config(highlightthickness=0)
         self.canvas.grid(row=0, column=0, columnspan=2)
+        self.canvas_card_img = self.canvas.create_image(400, 263)
+        self.canvas.itemconfig(self.canvas_card_img, image=self.img_card_front)
         self.canvas_title = self.canvas.create_text(canvas_width / 2, 150)
         self.canvas.itemconfig(self.canvas_title, text="", font=FONT_TITLE)
         self.canvas_word = self.canvas.create_text(canvas_width / 2, 250)
         self.canvas.itemconfig(self.canvas_word, text="", font=FONT_WORD)
 
-        self.btn_done = tk.Button(image=self.img_check, highlightthickness=0, bd=0)
+        self.btn_done = tk.Button(image=self.img_check, bd=0)
+        self.btn_done.config(highlightthickness=0)
         self.btn_done.config(command=self.on_press_check)
         self.btn_done.grid(row=1, column=1)
 
-        self.btn_x = tk.Button(image=self.img_x, highlightthickness=0, bd=0)
+        self.btn_x = tk.Button(image=self.img_x, bd=0)
+        self.btn_x.config(highlightthickness=0)
         self.btn_x.config(command=self.on_press_x)
         self.btn_x.grid(row=1, column=0)
 
@@ -71,17 +75,21 @@ class Application:
         self.current_after = self.window.after(TIMING, self.flip_word)
 
     def update_canvas(self, title, word, img, color):
-        self.canvas.itemconfig(self.canvas_title, text=title, font=FONT_TITLE, fill=color)
-        self.canvas.itemconfig(self.canvas_word, text=word, font=FONT_WORD, fill=color)
-        self.canvas.itemconfig(self.card_img, image=img)
+        self.canvas.itemconfig(self.canvas_title, text=title, fill=color)
+        self.canvas.itemconfig(self.canvas_word, text=word, fill=color)
+        self.canvas.itemconfig(self.canvas_card_img, image=img)
 
     def show_random_word(self):
         self.current_word = random.choice(self.words)
-        self.update_canvas("French", self.current_word["French"], self.img_card_front, "black")
+        title = "French"
+        word = self.current_word["French"]
+        self.update_canvas(title, word, self.img_card_front, "black")
         self.start_flip_time()
 
     def flip_word(self):
-        self.update_canvas("English", self.current_word["English"], self.img_card_back, "white")
+        title = "English"
+        word = self.current_word["English"]
+        self.update_canvas(title, word, self.img_card_back, "white")
 
     def on_press_check(self):
         self.remove_current_word()
