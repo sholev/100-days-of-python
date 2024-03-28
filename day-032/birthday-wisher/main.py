@@ -11,7 +11,7 @@ templates = ["letter_templates/letter_1.txt",
 today = dt.datetime.today()
 df = pandas.read_csv("birthdays.csv")
 today_records = df[(df['month'] == today.month) & (df['day'] == today.day)]
-mailer = Gmail("mailer/credentials.json")
+mailer = Gmail("../../gmail_cred.json")
 
 for index, row in today_records.iterrows():
     template = random.choice(templates)
