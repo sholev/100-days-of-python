@@ -1,3 +1,4 @@
+from os import urandom
 from flask import Flask, render_template, redirect, url_for
 from flask_bootstrap import Bootstrap5
 from flask_wtf import FlaskForm
@@ -6,7 +7,7 @@ from wtforms.validators import DataRequired, URL
 from csv import reader
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '8BYkEfBA6O6denzWlSihBXox7C0sKR6b'
+app.config['SECRET_KEY'] = urandom(32)
 Bootstrap5(app)
 
 
