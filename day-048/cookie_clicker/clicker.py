@@ -1,5 +1,6 @@
 import pyautogui
 import keyboard
+import time
 
 clicking = False
 
@@ -16,5 +17,6 @@ def click_mouse():
 keyboard.add_hotkey('f8', toggle_clicking)
 
 while True:
+    time.sleep(0.005)
     if clicking:
         click_mouse()
