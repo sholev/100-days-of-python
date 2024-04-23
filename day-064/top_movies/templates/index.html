@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}My Top 10 Movies{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class=flashes>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+    <h1 class="heading">My Top 10 Movies</h1>
+    <p class="description">These are my all-time favourite movies.</p>
+    <div class="container text-center add">
+        <a href="{{ url_for('add') }}" class="button">Add Movie</a>
+    </div>
+    {% for movie in movies %}
+    <div class="card">
+        <div class="front"
+             style="background-image: url('{{ movie.img_url }}');">
+            <p class="large">{{ movie.ranking }}</p>
+        </div>
+        <div class="back">
+            <div>
+                <div class="title">{{ movie.title }}<span
+                        class="release_date"> ({{ movie.year }})</span></div>
+                <div class="rating">
+                    <label>{{ movie.rating }}</label>
+                    <i class="fas fa-star star"></i>
+                </div>
+                <p class="review">{{ movie.review }}</p>
+                <p class="overview">{{ movie.description }}</p>
+
+                <form method="POST"
+                      action="{{ url_for('delete', movie_id=movie.id) }}">
+                    <a href="{{ url_for('rate', movie_id=movie.id) }}"
+                       class="button">Rate</a>
+                    <input type="hidden" name="csrf_token"
+                           value="{{ csrf_token() }}">
+                    <button type="submit" class="button delete-button btn-link"
+                            onclick="return confirm('Are you sure you want to delete this entry?')">
+                        Delete
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
