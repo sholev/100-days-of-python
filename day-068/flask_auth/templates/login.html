@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="box">
+    <h1>Login</h1>
+    <form method="POST" action="{{ url_for('login') }}">
+        {{ form.csrf_token }}
+        {{ form.email(placeholder="Email") }}
+        {{ form.password(placeholder="Password") }}
+        {{ form.submit(class="btn btn-primary btn-block btn-large") }}
+
+        {% for field in form %}
+        {% if field.errors %}
+            {% for error in field.errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+        {% endif %}
+        {% endfor %}
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+            <p>{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </form>
+</div>
+
+{% endblock %}
