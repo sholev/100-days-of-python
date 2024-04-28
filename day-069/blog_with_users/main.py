@@ -11,11 +11,12 @@ from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from models import Base, User, BlogPost
-from forms import CreatePostForm, RegisterUserForm, LoginUserForm
+from models import Base, User, BlogPost, Comment
+from forms import CreatePostForm, RegisterUserForm, LoginUserForm, CommentForm
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = urandom(32)
+ckeditor = CKEditor(app)
 Bootstrap5(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
@@ -52,7 +53,7 @@ def js():
         return Response(text, mimetype='text/plain')
 
 
-def gravatar_url(email, size=100, rating='g', default='retro', force_default=False):
+def avatar(email, size=100, rating='g', default='retro', force_default=False):
     hash_value = md5(email.lower().encode('utf-8')).hexdigest()
     params = f"{hash_value}?s={size}&d={default}&r={rating}&f={force_default}"
 
@@ -127,15 +128,26 @@ def home():
     return render_template("index.html", all_posts=posts)
 
 
-# TODO: Allow logged-in users to comment on posts
-@app.route('/post/<int:post_id>')
+@app.route('/post/<int:post_id>', methods=["GET", "POST"])
 def show_post(post_id):
     requested_post = db.get_or_404(BlogPost, post_id)
+    comment_form = CommentForm()
+    if comment_form.validate_on_submit():
+        if not current_user.is_authenticated:
+            flash("You need to login or register to comment.")
+            return redirect(url_for("login"))
 
-    return render_template('post.html', post=requested_post)
+        new_comment = Comment()
+        comment_form.populate_obj(new_comment)
+        new_comment.author = current_user
+        new_comment.post = requested_post
+        db.session.add(new_comment)
+        db.session.commit()
+
+    return render_template('post.html', post=requested_post, form=comment_form,
+                           get_avatar=avatar)
 
 
-# TODO: Use a decorator so only an admin user can create a new post
 @app.route('/new-post', methods=['GET', 'POST'])
 @admin_only
 def add_new_post():
@@ -143,6 +155,7 @@ def add_new_post():
     if form.validate_on_submit():
         new_post = BlogPost()
         form.populate_obj(new_post)
+        new_post.author = current_user
         new_post.date = date.today().strftime('%B %d, %Y')
         db.session.add(new_post)
         db.session.commit()
@@ -152,7 +165,6 @@ def add_new_post():
     return render_template('make-post.html', form=form)
 
 
-# TODO: Use a decorator so only an admin user can edit a post
 @app.route('/edit-post/<int:post_id>', methods=['GET', 'POST'])
 @admin_only
 def edit_post(post_id):
@@ -167,7 +179,6 @@ def edit_post(post_id):
     return render_template('make-post.html', form=edit_form, is_edit=True)
 
 
-# TODO: Use a decorator so only an admin user can delete a post
 @app.route('/delete/<int:post_id>', methods=['POST'])
 @admin_only
 def delete_post(post_id):
