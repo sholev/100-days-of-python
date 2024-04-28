@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request
+from flask import Flask, render_template, redirect, request, Response
 from markupsafe import escape
 from requests import get
 from datetime import datetime
@@ -28,9 +28,13 @@ def get_posts():
     return posts
 
 
-@app.route("/css")
+@app.route('/static/css/styles.css')
 def css():
-    return redirect(f"/static/css/styles.css")
+    css_path = '../../day-059/bootstrap_blog/static/css/styles.css'
+    with open(css_path, mode='rt', encoding='utf8') as file:
+        text = file.read()
+
+        return Response(text, mimetype='text/css')
 
 
 @app.route("/js/<path:path>")
